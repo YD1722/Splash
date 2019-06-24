@@ -254,10 +254,10 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 	//Set text color
 	dc.SetTextColor(RGB(0, 0, 0));
 	//Set text position;
-	RECT pos = {40,40,40,40 };
+	RECT pos = {100,100,100,100};
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
-	dc.DrawText(L"TestcsCSCzCzCzCzC", 4, &pos, DT_CALCRECT);
+	dc.DrawText(L"Test", 4, &pos, DT_CALCRECT);
 	dc.DrawText(L"Test", 4, &pos, 0);
 
 	//cleanup 

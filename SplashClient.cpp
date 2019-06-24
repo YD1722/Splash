@@ -22,7 +22,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     //  Display the splash screen using the overloaded construcutor
     //  =======================================================================
     //  Launch splash screen
-    CSplash splash1(TEXT(".\\dada.bmp"), RGB(0, 0, 0));
+    CSplash splash1(TEXT(".\\dada.bmp"), RGB(255, 255, 255));
     splash1.ShowSplash();
 
     // your start up code here
@@ -33,26 +33,26 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	PROCESS_INFORMATION pi;
 
 	// set the size of the structures
-	/*ZeroMemory(&si, sizeof(si));
+	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
 
 	LPWSTR appPath = new WCHAR[500];
-	wcscpy_s(appPath, 500, mainAppPath);*/
+	wcscpy_s(appPath, 500, mainAppPath);
 
 	
-	// start the program up
-	//CreateProcess(NULL,   // the path
-	//	appPath,        // Command line
-	//	NULL,           // Process handle not inheritable
-	//	NULL,           // Thread handle not inheritable
-	//	TRUE,          // Set handle inheritance to FALSE
-	//	0,              // No creation flags
-	//	NULL,           // Use parent's environment block
-	//	mainAppDirectory,           // Use parent's starting directory 
-	//	&si,            // Pointer to STARTUPINFO structure
-	//	&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-	//);
+	 //start the program up
+	CreateProcess(NULL,   // the path
+		appPath,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		TRUE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		mainAppDirectory,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+	);
 
 	splash1.CloseSplash();
 	//splash1.CloseSplash();
