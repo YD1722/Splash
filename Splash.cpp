@@ -110,7 +110,6 @@ CSplash::CSplash(LPCTSTR lpszFileName, COLORREF colTrans)
     Init();
 
     SetBitmap(lpszFileName);
-    SetTransparentColor(colTrans);
 }
 
 CSplash::~CSplash()
@@ -158,7 +157,6 @@ HWND CSplash::RegAndCreateWindow()
     //  =======================================================================
     if(m_hwnd)
     {
-        MakeTransparent();
         ShowWindow   (m_hwnd, SW_SHOW) ;
         UpdateWindow (m_hwnd);
     }
@@ -201,7 +199,8 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
     //  =======================================================================
     HBITMAP    hBitmap       = NULL;
     hBitmap = (HBITMAP)::LoadImage(0, lpszFileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
+	
+	// get the basic attribute of the bitmap
 	BITMAP bm;
 	GetObject(hBitmap, sizeof(BITMAP), &bm);
 	long width = bm.bmWidth;
@@ -215,9 +214,16 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 	bmInfo.bmiHeader.biHeight = height;
 	bmInfo.bmiHeader.biPlanes = 1;
 	bmInfo.bmiHeader.biBitCount = 24;
+
 	//create a temporary dc in memory.
+
+	/*he GetDC function retrieves a handle to a device context(DC) for the client area of a specified window or for the entire screen.
+		You can use the returned handle in subsequent GDI functions to draw in the DC.The device context 
+		is an opaque data structure, whose values are used internally by GDI.*/
+
 	HDC pDC = ::GetDC(0);
-	HDC TmpDC = CreateCompatibleDC(pDC);
+	HDC TmpDC = CreateCompatibleDC(pDC); // The CreateCompatibleDC function creates a memory device context (DC) compatible with the specified device.
+
 	//create a new bitmap and select it in the memory dc
 	BYTE* pbase;
 	HBITMAP TmpBmp = CreateDIBSection(pDC,
@@ -231,18 +237,16 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 	SelectObject(dcBmp, TmpObj2);
 	DeleteDC(dcBmp);
 
-	//choose the font
+	// Choose the font and properties
 	CFont m_Font;
 	LOGFONT* m_pLF;
 	m_pLF = (LOGFONT*)calloc(1, sizeof(LOGFONT));
-	_tcsncpy(m_pLF->lfFaceName, L"Times New Roman", 31);
-	m_pLF->lfHeight = 64;
-	m_pLF->lfWeight = 600;
-	m_pLF->lfItalic = 1;
-	m_pLF->lfUnderline = 0;
+	_tcsncpy(m_pLF->lfFaceName, L"Arial", 8);
+	m_pLF->lfHeight = 20;
+	m_pLF->lfWeight = 800;
 	m_Font.CreateFontIndirect(m_pLF);
 
-	//select the font in the dc
+	// Select the font in the dc
 	CDC dc;
 	dc.Attach(TmpDC);
 	CFont* pOldFont = NULL;
@@ -252,22 +256,25 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 		dc.SelectObject(GetStockObject(DEFAULT_GUI_FONT));
 
 	//Set text color
-	dc.SetTextColor(RGB(0, 0, 0));
+	dc.SetTextColor(RGB(255, 255, 255));
 	//Set text position;
-	RECT pos = {100,100,100,100};
+	RECT pos = {1,height- m_pLF->lfHeight,0,0};
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
-	dc.DrawText(L"Test", 4, &pos, DT_CALCRECT);
-	dc.DrawText(L"Test", 4, &pos, 0);
+	dc.DrawText(L"Application is loading....", -1, &pos, DT_CALCRECT);  // This can be according to the websocket communication
+	dc.DrawText(L"Application is loading....", -1, &pos, 0);
 
-	//cleanup 
+	//Cleanup 
 	if (pOldFont) dc.SelectObject(pOldFont);
 	m_Font.DeleteObject();
 	dc.Detach();
 	free(m_pLF);
-	
+
+	DeleteObject(hBitmap);
 	hBitmap = TmpBmp;
 
+	SelectObject(TmpDC, TmpObj);
+	DeleteDC(TmpDC);
 
     return SetBitmap(hBitmap);
 }
@@ -322,24 +329,4 @@ int CSplash::CloseSplash()
     return 0;
 }
 
-bool CSplash::SetTransparentColor(COLORREF col)
-{
-    m_colTrans = col;
 
-    return MakeTransparent();
-}
-
-bool CSplash::MakeTransparent()
-{
-    //  =======================================================================
-    //  Set the layered window style and make the required color transparent
-    //  =======================================================================
-    if(m_hwnd && g_pSetLayeredWindowAttributes && m_colTrans )
-    {
-        //  set layered style for the window
-        SetWindowLong(m_hwnd, GWL_EXSTYLE, GetWindowLong(m_hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-        //  call it with 0 alpha for the given color
-        g_pSetLayeredWindowAttributes(m_hwnd, m_colTrans, 0, LWA_COLORKEY);
-    }    
-    return TRUE;
-}
