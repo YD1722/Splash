@@ -258,7 +258,7 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 	//Set text color
 	dc.SetTextColor(RGB(255, 255, 255));
 	//Set text position;
-	RECT pos = {1,height- m_pLF->lfHeight,0,0};
+	RECT pos = {1,height- m_pLF->lfHeight,0,0}; // Left align the text
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
 	dc.DrawText(L"Application is loading....", -1, &pos, DT_CALCRECT);  // This can be according to the websocket communication
