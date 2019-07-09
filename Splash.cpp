@@ -105,11 +105,11 @@ CSplash::CSplash()
     Init();
 }
 
-CSplash::CSplash(LPCTSTR lpszFileName, COLORREF colTrans)
+CSplash::CSplash(LPCTSTR lpszFileName, COLORREF colTrans, LPCTSTR message)
 {
     Init();
 
-    SetBitmap(lpszFileName);
+    SetBitmap(lpszFileName, message);
 }
 
 CSplash::~CSplash()
@@ -187,12 +187,12 @@ int CSplash::DoLoop()
 
 void CSplash::ShowSplash()
 {
-    CloseSplash();
+    //CloseSplash();
     RegAndCreateWindow();
 }
 
 
-DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
+DWORD CSplash::SetBitmap(LPCTSTR lpszFileName, LPCTSTR message)
 {
     //  =======================================================================
     //  load the bitmap
@@ -261,8 +261,8 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName)
 	RECT pos = {1,height- m_pLF->lfHeight,0,0}; // Left align the text
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
-	dc.DrawText(L"Application is loading....", -1, &pos, DT_CALCRECT);  // This can be according to the websocket communication
-	dc.DrawText(L"Application is loading....", -1, &pos, 0);
+	dc.DrawText(message, -1, &pos, DT_CALCRECT); 
+	dc.DrawText(message, -1, &pos, 0);
 
 	//Cleanup 
 	if (pOldFont) dc.SelectObject(pOldFont);

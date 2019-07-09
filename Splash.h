@@ -27,7 +27,7 @@ public:
     //  Arg    Path of the Bitmap that will be show on the splash screen
     //  Arg    The color on the bitmap that will be made transparent
     //  =======================================================================
-    CSplash(LPCTSTR lpszFileName, COLORREF colTrans);
+    CSplash(LPCTSTR lpszFileName, COLORREF colTrans, LPCTSTR message);
 
     //  =======================================================================
     //  Func   ~CSplash
@@ -64,7 +64,7 @@ public:
     //  Ret    1 if succesfull
     //  Arg    Either the file path or the handle to an already loaded bitmap
     //  =======================================================================
-    DWORD SetBitmap(LPCTSTR lpszFileName);
+    DWORD SetBitmap(LPCTSTR lpszFileName, LPCTSTR message);
     DWORD SetBitmap(HBITMAP hBitmap);
 
     //  =======================================================================
