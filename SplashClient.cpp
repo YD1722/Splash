@@ -14,12 +14,15 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
-LPCWSTR mainAppDirectory = L"C:\\Program Files (x86)\\DirectFN Pro11 Price\\";
-LPCWSTR mainAppPath = L"C:\\Program Files (x86)\\DirectFN Pro11 Price\\launcher.exe";
-LPCWSTR tempFilePath = L"C:\\Users\\yashodhah\\AppData\\Local\\OpenFin\\temp.dat"; // TODO: [Yashodha] Make this common
+LPCWSTR mainAppDirectory = L"C:\\Program Files\\DirectFN Pro11 Price\\";
+LPCWSTR mainAppPath = L"C:\\Program Files\\DirectFN Pro11 Price\\launcher.exe";
+
+string profile = getenv("USERPROFILE");
+string tempFilePath = profile+ "\\AppData\\Local\\OpenFin\\temp.dat"; 
 
 int APIENTRY WinMain(
 					 HINSTANCE hInstance,
@@ -36,7 +39,7 @@ int APIENTRY WinMain(
 		
 	LPWSTR* szArgList;
 	int argCount;
-	LPCTSTR inputMessage = L"Loading......";
+	LPCTSTR inputMessage = L"Loading ...";
 	int sleepTime =1000;
 
 	STARTUPINFO si;
@@ -53,11 +56,11 @@ int APIENTRY WinMain(
 	szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 
 	if (szArgList == NULL || szArgList[1] == NULL)
-
 	{
 
 		myfile.open(tempFilePath);
 		myfile.close();
+
 		CreateProcess(NULL,   // the path
 			appPath,        // Command line
 			NULL,           // Process handle not inheritable
@@ -73,41 +76,55 @@ int APIENTRY WinMain(
 
 		LocalFree(szArgList);
 
-		CSplash splash(TEXT(".\\titanium.bmp"), RGB(0, 0, 0), inputMessage);
+		CSplash splash(TEXT(".\\splash.bmp"), RGB(0, 0, 0), inputMessage);
 		splash.ShowSplash();
 
-	
-		string path = "C:\\Users\\yashodhah\\AppData\\Local\\OpenFin\\temp.dat";
-
-		while (true) {
+		for (int a = 0; a < 1200; a = a + 1) {
 			struct stat buffer;
-			if (!(stat(path.c_str(), &buffer) == 0)) {
+			if (!(stat(tempFilePath.c_str(), &buffer) == 0)) {
 				splash.CloseSplash();
 				break;
+				return 0;
 			}
+			Sleep(50);
 		}
+		if (remove(tempFilePath.c_str()) != 0)
+			return 0;
+		else
+			return 1;
+		splash.CloseSplash();
 	}
-	else {
-
-	/*	for (int i = 0; i < argCount; i++)
-	{
-		MessageBox(NULL, szArgList[i], L"Arglist contents", MB_OK);
-	}*/
-		///inputMessage = szArgList[1];
+	else {	
 		int messageType = _wtoi(szArgList[1]);
 
 		switch (messageType) {
-		case 1: // Updates
-			inputMessage = L"Application is updating....";
+		case 0:
+			inputMessage = L"Application is initializing ...";
 
 			myfile.open(tempFilePath);
 			myfile.close();
 
-			break;
+			CreateProcess(NULL,   // the path
+				appPath,        // Command line
+				NULL,           // Process handle not inheritable
+				NULL,           // Thread handle not inheritable
+				TRUE,          // Set handle inheritance to FALSE
+				0,              // No creation flags
+				NULL,           // Use parent's environment block
+				mainAppDirectory,           // Use parent's starting directory 
+				&si,            // Pointer to STARTUPINFO structure
+				&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+			);
 
-		case 2: // Restarting
-			inputMessage = L"Application is restarting....";
-			
+			LocalFree(szArgList);
+
+			break;
+		case 1: // Updates
+			inputMessage = L"Application is updating ...";
+
+			myfile.open(tempFilePath);
+			myfile.close();
+
 			break;
 			
 		default:
@@ -115,67 +132,32 @@ int APIENTRY WinMain(
 			myfile.close();
 		}
 
-		CSplash splash(TEXT(".\\titanium.bmp"), RGB(0, 0, 0), inputMessage);
+		CSplash splash(TEXT(".\\splash.bmp"), RGB(0, 0, 0), inputMessage);
 		splash.ShowSplash();
 
-		string path = "C:\\Users\\yashodhah\\AppData\\Local\\OpenFin\\temp.dat";
-
-		while (true) { // TODO: [Yashodha] Make this a for loop
+		for (int a = 0; a < 1200; a = a + 1) {
 			struct stat buffer;
-			if (!(stat(path.c_str(), &buffer) == 0)) {
+			if (!(stat(tempFilePath.c_str(), &buffer) == 0)) {
 				splash.CloseSplash();
 				break;
+				return 0;
 			}
-		}		
+			Sleep(50);
+		}
+
+		if (remove(tempFilePath.c_str()) != 0)
+			return 0;
+		else
+			return 1;
+		splash.CloseSplash();
 	}
-	//return 0;
-
-	//szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
-
-	//if (szArgList == NULL || szArgList[1] == NULL)
-	//{
-	//	// //start the program up
-	//	CreateProcess(NULL,   // the path
-	//		appPath,        // Command line
-	//		NULL,           // Process handle not inheritable
-	//		NULL,           // Thread handle not inheritable
-	//		TRUE,          // Set handle inheritance to FALSE
-	//		0,              // No creation flags
-	//		NULL,           // Use parent's environment block
-	//		mainAppDirectory,           // Use parent's starting directory 
-	//		&si,            // Pointer to STARTUPINFO structure
-	//		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
-	//	);
-	//}
-	//else {
-	//	inputMessage = szArgList[1];
-	//}
-
-	/*for (int i = 0; i < argCount; i++)
-	{
-		MessageBox(NULL, szArgList[i], L"Arglist contents", MB_OK);
-	}*/
-	//LPCTSTR 
-/*
-	LocalFree(szArgList);
-
-    CSplash splash(TEXT(".\\titanium.bmp"), RGB(0, 0, 0), inputMessage);
-    splash.ShowSplash();*/
-
-    //Sleep(_wtoi(sleepTime)); 
-	//Sleep(sleepTime);
-
-
 	
-
 	
 	//WaitForSingleObject(pi.hProcess, INFINITE);
-
 	
 	// Close process and thread handles. 
 	//CloseHandle(pi.hProcess);
 	//CloseHandle(pi.hThread);
-	
 }
 
 

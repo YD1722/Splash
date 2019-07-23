@@ -241,8 +241,8 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName, LPCTSTR message)
 	CFont m_Font;
 	LOGFONT* m_pLF;
 	m_pLF = (LOGFONT*)calloc(1, sizeof(LOGFONT));
-	_tcsncpy(m_pLF->lfFaceName, L"Arial", 8);
-	m_pLF->lfHeight = 20;
+	_tcsncpy(m_pLF->lfFaceName, L"Arial", 23);
+	m_pLF->lfHeight = 17;
 	m_pLF->lfWeight = 800;
 	m_Font.CreateFontIndirect(m_pLF);
 
@@ -258,7 +258,11 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName, LPCTSTR message)
 	//Set text color
 	dc.SetTextColor(RGB(255, 255, 255));
 	//Set text position;
-	RECT pos = {1,height- m_pLF->lfHeight,0,0}; // Left align the text
+	//(width / 2 - (lstrlen(message) / 2))
+	SIZE sizeText;
+	GetTextExtentPoint32(GetDC(NULL) , message, lstrlen(message), &sizeText);
+
+	RECT pos = { ((width / 2)-(sizeText.cx/2)),(height- m_pLF->lfHeight-5),((width / 2) + (lstrlen(message) / 2)),0};
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
 	dc.DrawText(message, -1, &pos, DT_CALCRECT); 
