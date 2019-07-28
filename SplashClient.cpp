@@ -39,7 +39,7 @@ int APIENTRY WinMain(
 		
 	LPWSTR* szArgList;
 	int argCount;
-	LPCTSTR inputMessage = L"Loading ...";
+	LPCTSTR inputMessage = L"";
 	int sleepTime =1000;
 
 	STARTUPINFO si;
@@ -120,7 +120,7 @@ int APIENTRY WinMain(
 
 			break;
 		case 1: // Updates
-			inputMessage = L"Application is updating ...";
+			inputMessage = L"Application is updating. Please Wait ...";
 
 			myfile.open(tempFilePath);
 			myfile.close();

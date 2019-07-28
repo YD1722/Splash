@@ -5,6 +5,7 @@
 #include <afxwin.h>
 #include "splash.h"
 #include "windowsx.h"
+#include "wtypes.h"
 
 //  ===========================================================================
 //  The following is used for layering support which is used in the 
@@ -139,12 +140,28 @@ HWND CSplash::RegAndCreateWindow()
     if(!RegisterClassEx (&wndclass))
         return NULL;
 
+
+	//RECT desktop;
+	//const HWND hDesktop = GetDesktopWindow();
+
+	//GetWindowRect(hDesktop, &desktop);
+
+	//int horizontal = desktop.right;
+	//int vertical = desktop.bottom;
+
+	RECT xy;
+	BOOL fResult = SystemParametersInfo(SPI_GETWORKAREA, 0, &xy, 0);
+
+	DWORD nScrHeight = xy.bottom - xy.top;
+	DWORD  nScrWidth = xy.right - xy.left;
+	
+
     //  =======================================================================
     //  Create the window of the application, passing the this pointer so that
     //  ExtWndProc can use that for message forwarding
     //  =======================================================================
-    DWORD nScrWidth  = ::GetSystemMetrics(SM_CXFULLSCREEN);
-    DWORD nScrHeight = ::GetSystemMetrics(SM_CYFULLSCREEN);
+    //DWORD nScrWidth  = ::GetSystemMetrics(SM_CXFULLSCREEN);
+    //DWORD nScrHeight = ::GetSystemMetrics(SM_CYSCREEN);
 
     int x = (nScrWidth  - m_dwWidth) / 2;
     int y = (nScrHeight - m_dwHeight) / 2;
