@@ -57,6 +57,8 @@ public:
     //  =======================================================================
     int CloseSplash();
 
+	BOOL Is32BitWindows();
+
     //  =======================================================================
     //  Func   SetBitmap
     //  Desc   Call this with the path of the bitmap. Not required to be used
