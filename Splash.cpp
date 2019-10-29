@@ -6,6 +6,23 @@
 #include "splash.h"
 #include "windowsx.h"
 #include "wtypes.h"
+#include <string>
+#include <iostream>
+
+#include "splash.h"
+#include <stdlib.h>
+#include<iostream>
+#include <windows.h>
+#include <string>
+#include <shellapi.h>
+#include <stdlib.h>
+#include <fstream>
+#include <iostream>
+#include <sys/stat.h>
+#include <cstring>
+#include <cstdlib>
+
+using namespace std;
 
 //  ===========================================================================
 //  The following is used for layering support which is used in the 
@@ -23,6 +40,7 @@ lpfnSetLayeredWindowAttributes g_pSetLayeredWindowAttributes;
 #define WS_EX_LAYERED 0x00080000 
 #define LWA_COLORKEY 1 // Use color as the transparency color.
 #define LWA_ALPHA    2 // Use bAlpha to determine the opacity of the layer
+#define WM_LBUTTONDOWN
 
 //  ===========================================================================
 //  Func    ExtWndProc
@@ -139,7 +157,8 @@ HWND CSplash::RegAndCreateWindow()
 
     if(!RegisterClassEx (&wndclass))
         return NULL;
-
+	if ((GetKeyState(VK_LBUTTON) & 0x100) != 0)
+		return NULL;
 
 	//RECT desktop;
 	//const HWND hDesktop = GetDesktopWindow();
@@ -165,7 +184,7 @@ HWND CSplash::RegAndCreateWindow()
 
     int x = (nScrWidth  - m_dwWidth) / 2;
     int y = (nScrHeight - m_dwHeight) / 2;
-    m_hwnd = ::CreateWindowEx(WS_EX_TOPMOST|WS_EX_TOOLWINDOW, m_lpszClassName, 
+    m_hwnd = ::CreateWindowEx(WS_EX_TOOLWINDOW, m_lpszClassName, 
                               TEXT("Banner"), WS_POPUP, x, y, 
                               m_dwWidth, m_dwHeight, NULL, NULL, NULL, this);
 
@@ -192,10 +211,16 @@ int CSplash::DoLoop()
     //  Get into the modal loop
     //  =======================================================================
     MSG msg ;
-    while (GetMessage (&msg, NULL, 0, 0))
-    {
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
         TranslateMessage (&msg) ;
         DispatchMessage  (&msg) ;
+/*
+		if (msg.message == WM_LBUTTONUP)
+		{
+			cout << 'test';
+			return NULL;
+		}*/
     }
 
     return msg.wParam ;
@@ -204,7 +229,7 @@ int CSplash::DoLoop()
 
 void CSplash::ShowSplash()
 {
-    //CloseSplash();
+    CloseSplash();
     RegAndCreateWindow();
 }
 
@@ -279,7 +304,7 @@ DWORD CSplash::SetBitmap(LPCTSTR lpszFileName, LPCTSTR message)
 	SIZE sizeText;
 	GetTextExtentPoint32(GetDC(NULL) , message, lstrlen(message), &sizeText);
 
-	RECT pos = { ((width / 2)-(sizeText.cx/2)),(height- m_pLF->lfHeight-5),((width / 2) + (lstrlen(message) / 2)),0};
+	RECT pos = {((width / 2)-(sizeText.cx/2)),(height- m_pLF->lfHeight-5),((width / 2) + (lstrlen(message) / 2)),0};
 	//draw the text
 	dc.SetBkMode(TRANSPARENT);
 	dc.DrawText(message, -1, &pos, DT_CALCRECT); 
@@ -349,6 +374,34 @@ int CSplash::CloseSplash()
     }
     return 0;
 }
+
+void CSplash::executeProgram(LPCWSTR command, LPCWSTR workingDir) {
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	// set the size of the structures
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	LPWSTR parsedCmd = new WCHAR[500];
+	wcscpy_s(parsedCmd, 500, command);
+
+	CreateProcess(NULL,   // the path
+		parsedCmd,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		TRUE,          // Set handle inheritance to FALSE
+		CREATE_NO_WINDOW,              // No creation flags
+		NULL,           // Use parent's environment block
+		workingDir,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+	);
+};
+
+
+
 
 
 
