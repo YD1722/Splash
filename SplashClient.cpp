@@ -52,7 +52,11 @@ int APIENTRY WinMain(
 	if ((stat(shadowAppPath.c_str(), &buffer1) == 0)) {
 		string command = shadowAppPath;
 
-		if (szArgList != NULL || szArgList[1] != NULL) {
+		/** Check if any argument is passsed and recreate 
+		 *  the command accordingly
+		 */
+		if (szArgList != NULL && szArgList[1] != NULL)
+		{
 			int argNum = _wtoi(szArgList[1]);
 			string arg = to_string(argNum);
 
@@ -108,11 +112,11 @@ int APIENTRY WinMain(
 				myfile.close();
 
 				CSplash splash(TEXT(".\\splash.bmp"), RGB(0, 0, 0), inputMessage);
+
+				splash.ShowSplash();
 				splash.executeProgram(nodeCmd, nodeWorkingDir);
 
 				LocalFree(szArgList);
-
-				splash.ShowSplash();
 
 				for (int a = 0; a < 1200; a = a + 1) {
 					struct stat buffer;
@@ -123,12 +127,12 @@ int APIENTRY WinMain(
 					}
 					Sleep(50);
 				}
+
 				if (remove(tempFilePath.c_str()) != 0)
 					return 0;
 				else
 					return 1;
 
-				Sleep(10000);
 				splash.CloseSplash();
 			}
 			else {
@@ -166,6 +170,9 @@ int APIENTRY WinMain(
 
 					break;
 
+				case 4:// Execute the app
+					
+					break;
 				default:
 					myfile.open(tempFilePath);
 					myfile.close();
@@ -217,21 +224,20 @@ int APIENTRY WinMain(
 			const wchar_t *ptr = r1.c_str();*/
 		}
 		else {
-			nodeCmd = L"C:\Program Files\DirectFN Pro11 Price\\node.exe launcher";
+			nodeCmd = L"C:\\Program Files\\DirectFN Pro11 Price\\node.exe launcher";
 			nodeWorkingDir = L"C:\\Program Files\\DirectFN Pro11 Price";
 
-			// No shadow installtion directory
 			if (szArgList == NULL || szArgList[1] == NULL)
 			{
 				myfile.open(tempFilePath);
 				myfile.close();
 
 				CSplash splash(TEXT(".\\splash.bmp"), RGB(0, 0, 0), inputMessage);
+
+				splash.ShowSplash();
 				splash.executeProgram(nodeCmd, nodeWorkingDir);
 
 				LocalFree(szArgList);
-
-				splash.ShowSplash();
 
 				for (int a = 0; a < 1200; a = a + 1) {
 					struct stat buffer;
@@ -247,7 +253,6 @@ int APIENTRY WinMain(
 				else
 					return 1;
 
-				Sleep(10000);
 				splash.CloseSplash();
 			}
 			else {
@@ -285,6 +290,32 @@ int APIENTRY WinMain(
 
 					break;
 
+				case 4:// Execute the app
+					STARTUPINFO si;
+					PROCESS_INFORMATION pi;
+
+					// set the size of the structures
+					ZeroMemory(&si, sizeof(si));
+					si.cb = sizeof(si);
+					ZeroMemory(&pi, sizeof(pi));
+
+					LPWSTR parsedCmd = new WCHAR[500];
+					wcscpy_s(parsedCmd, 500, nodeCmd);
+
+					CreateProcess(NULL,   // the path
+						parsedCmd,        // Command line
+						NULL,           // Process handle not inheritable
+						NULL,           // Thread handle not inheritable
+						TRUE,          // Set handle inheritance to FALSE
+						CREATE_NO_WINDOW,              // No creation flags
+						NULL,           // Use parent's environment block
+						nodeWorkingDir,           // Use parent's starting directory 
+						&si,            // Pointer to STARTUPINFO structure
+						&pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+					);
+
+					break;
+
 				default:
 					myfile.open(tempFilePath);
 					myfile.close();
@@ -310,7 +341,7 @@ int APIENTRY WinMain(
 				else
 					return 1;
 
-				Sleep(10000);
+				//Sleep(10000);
 				splash.CloseSplash();
 			}
 		}
@@ -341,11 +372,12 @@ int APIENTRY WinMain(
 
 	//}
 
-	//WaitForSingleObject(pi.hProcess, INFINITE);
+	// WaitForSingleObject(pi.hProcess, INFINITE);
 
 	 // Close process and thread handles. 
-	//CloseHandle(pi.hProcess);
-	//CloseHandle(pi.hThread);
+
+	// CloseHandle(pi.hProcess);
+	// CloseHandle(pi.hThread);
 }
 
 
