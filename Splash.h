@@ -57,7 +57,7 @@ public:
     //  =======================================================================
     int CloseSplash();
 
-	void executeProgram(LPCWSTR command, LPCWSTR workingDir);
+	void executeProgram(LPCWSTR command, LPCWSTR workingDir, LPCTSTR inputMessage);
 
 	BOOL Is32BitWindows();
 

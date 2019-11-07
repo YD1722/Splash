@@ -375,7 +375,7 @@ int CSplash::CloseSplash()
     return 0;
 }
 
-void CSplash::executeProgram(LPCWSTR command, LPCWSTR workingDir) {
+void CSplash::executeProgram(LPCWSTR command, LPCWSTR workingDir, LPCTSTR inputMessage) {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
