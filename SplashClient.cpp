@@ -13,15 +13,13 @@
 
 #include "splash.h"
 #include "ProcessHandler.h"
+#include <direct.h>
+
+#define GetCurrentDir _getcwd
 
 using namespace std;
 
-string profile = getenv("USERPROFILE");
-string userDataDir = profile + "\\AppData\\Local\\DirectFN";
-string tempFilePath = userDataDir + "\\temp.dat";
-string shadowInstallerDir = userDataDir + "\\DirectFN_Pro11_Price_4294798646\\shadowInstaller";
-string shadowAppPath = shadowInstallerDir + "\\application.exe";
-string shadowNodePath = shadowInstallerDir + "\\node.exe";
+
 LPCTSTR inputMessage = L"";
 
 LPCWSTR nodeCmd;
@@ -40,74 +38,51 @@ int APIENTRY WinMain(
 	szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
 	struct stat buffer1;
 
-	/**Check if the shadow entry point exists
-	 * in the user directory
-	 */
-	if ((stat(shadowAppPath.c_str(), &buffer1) == 0)) {
-		string command = shadowAppPath;
+	string profile= getenv("USERPROFILE");
+	string wd = profile + "\\AppData\\Local\\DirectFN\\DirectFN_Pro11_Price_QA_4294798646\\assets\\shadowInstaller\\app";
 
-		/** Check if any argument is passsed and recreate 
-		 *  the command accordingly
-		 */
-		if (szArgList != NULL && szArgList[1] != NULL)
-		{
-			int argNum = _wtoi(szArgList[1]);
-			string arg = to_string(argNum);
+	/*char buff[MAX_PATH];
+	getcwd(buff, MAX_PATH);
+	std::string wd(buff);*/
 
-			command = command + " " + arg;
-		}
+	std::wstring parsed_wd = std::wstring(wd.begin(), wd.end());
+	nodeWorkingDir = parsed_wd.c_str();
 
-		nodeCmd = processHandler.stringToLPCWSTR(command);
-		nodeWorkingDir = processHandler.stringToLPCWSTR(shadowInstallerDir);
+	if (szArgList == NULL || szArgList[1] == NULL)
+	{
+		std::wstring mywstring(nodeWorkingDir);
+		std::wstring concatted_stdstr = mywstring + L"\\node.exe launcher";
+		nodeCmd = concatted_stdstr.c_str();
 
-		processHandler.executeProgram(nodeCmd, nodeWorkingDir,false);
+		processHandler.executeProgram(nodeCmd, nodeWorkingDir, L"");
 	}
 	else {
-		if ((stat(shadowNodePath.c_str(), &buffer1) == 0)) {
-			nodeWorkingDir = processHandler.stringToLPCWSTR(shadowInstallerDir);
+		int messageType = _wtoi(szArgList[1]);
 
-			if (szArgList == NULL || szArgList[1] == NULL)
-			{
-				nodeCmd = processHandler.concatLPCWSTR(processHandler.stringToLPCWSTR(shadowNodePath), L" launcher");
-				processHandler.executeProgram(nodeCmd, nodeWorkingDir,true);
-			}
-			else {
-				int messageType = _wtoi(szArgList[1]);
+		if (messageType == 0) {
+			std::wstring mywstring(nodeWorkingDir);
+			std::wstring concatted_stdstr = mywstring + L"\\node.exe launcher";
+			nodeCmd = concatted_stdstr.c_str();
 
-				if (messageType == 10) {
-					nodeCmd = processHandler.concatLPCWSTR(processHandler.stringToLPCWSTR(shadowNodePath), L" launchAfterUpdate");
+			inputMessage = L"Application is initializing ...";
+			processHandler.executeProgram(nodeCmd, nodeWorkingDir, inputMessage);
+		}
+		else if (messageType == 10) {
+			std::wstring mywstring(nodeWorkingDir);
+			std::wstring concatted_stdstr = mywstring + L"\\node.exe launchAfterUpdate";
+			nodeCmd = concatted_stdstr.c_str();
 
-					processHandler.executeProgram(nodeCmd, nodeWorkingDir,false);
-				}
-				else {
-					inputMessage = processHandler.getInputMessage(messageType);
-					processHandler.showSplash(inputMessage);
-				}
-			}
+			processHandler.executeProgram(nodeCmd, nodeWorkingDir);
+		}else if (messageType == 11) {
+			std::wstring mywstring(nodeWorkingDir);
+			std::wstring concatted_stdstr = mywstring + L"\\node.exe silentLaunchAfterUpdate";
+			nodeCmd = concatted_stdstr.c_str();
+
+			processHandler.executeProgram(nodeCmd, nodeWorkingDir);
 		}
 		else {
-			nodeWorkingDir = L"C:\\Program Files\\DirectFN Pro11 Price";
-
-			if (szArgList == NULL || szArgList[1] == NULL)
-			{
-				nodeCmd = L"C:\\Program Files\\DirectFN Pro11 Price\\node.exe launcher";
-
-				processHandler.executeProgram(nodeCmd, nodeWorkingDir, true);
-			}
-			else {
-				int messageType = _wtoi(szArgList[1]);
-
-				if (messageType == 10) {
-					nodeCmd = L"C:\\Program Files\\DirectFN Pro11 Price\\node.exe launchAfterUpdate";
-
-					processHandler.executeProgram(nodeCmd, nodeWorkingDir,false);
-				}
-				else {
-					inputMessage = processHandler.getInputMessage(messageType);
-					processHandler.showSplash(inputMessage);
-				}
-				//LocalFree(szArgList);
-			}
+			inputMessage = processHandler.getInputMessage(messageType);
+			processHandler.showSplash(inputMessage);
 		}
 	}
 }

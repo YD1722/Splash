@@ -15,13 +15,13 @@ LPCWSTR ProcessHandler::stringToLPCWSTR(string str ) {
 	return stemp.c_str();
 }
 
-LPCWSTR ProcessHandler::concatLPCWSTR(LPCWSTR str1, LPCWSTR str2) {
+wstring ProcessHandler::concatLPCWSTR(LPCWSTR str1, LPCWSTR str2) {
 	std::wstring mywstring(str1);
 	std::wstring concatted_stdstr = mywstring + str2;
 	return concatted_stdstr.c_str();
 }
 
-void ProcessHandler::executeProgram(LPCWSTR command, LPCWSTR workingDir, bool isShowSPlash) {
+void ProcessHandler::executeProgram(LPCWSTR command, LPCWSTR workingDir) {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
@@ -33,7 +33,7 @@ void ProcessHandler::executeProgram(LPCWSTR command, LPCWSTR workingDir, bool is
 	wcscpy_s(parsedCmd, 500, command);
 
 	// Start the child process.
-	if (!CreateProcess(NULL,   // the path
+	CreateProcess(NULL,   // the path
 		parsedCmd,        // Command line
 		NULL,           // Process handle not inheritable
 		NULL,           // Thread handle not inheritable
@@ -42,21 +42,47 @@ void ProcessHandler::executeProgram(LPCWSTR command, LPCWSTR workingDir, bool is
 		NULL,           // Use parent's environment block
 		workingDir,           // Use parent's starting directory 
 		&si,            // Pointer to STARTUPINFO structure
-		&pi)) // Pointer to PROCESS_INFORMATION
-	{
-		puts("Error");
-		return;
-	}
-
-	if (isShowSPlash) {
-		showSplash(L"");
-	}
-
+		&pi); // Pointer to PROCESS_INFORMATION
+	
 	// Wait until child process exits.
-	WaitForSingleObject(pi.hProcess, INFINITE);
+	//WaitForSingleObject(pi.hProcess, INFINITE);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 };
+
+void ProcessHandler::executeProgram(LPCWSTR command, LPCWSTR workingDir, LPCWSTR inputMessage) {
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	LPWSTR parsedCmd = new WCHAR[500];
+	wcscpy_s(parsedCmd, 500, command);
+
+	// Start the child process.
+	CreateProcess(NULL,   // the path
+		parsedCmd,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		TRUE,          // Set handle inheritance to FALSE
+		CREATE_NO_WINDOW,              // No creation flags
+		NULL,           // Use parent's environment block
+		workingDir,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi); // Pointer to PROCESS_INFORMATION
+	
+	showSplash(inputMessage);
+
+	// Wait until child process exits.
+	//WaitForSingleObject(pi.hProcess, INFINITE); 
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+};
+
+
 
 LPCTSTR ProcessHandler::getInputMessage(int messageType) {
 	LPCTSTR inputMessage = L"";
@@ -85,7 +111,7 @@ LPCTSTR ProcessHandler::getInputMessage(int messageType) {
 	return inputMessage;
 };
 
-void ProcessHandler::showSplash(LPCTSTR inputMessage) {
+int ProcessHandler::showSplash(LPCTSTR inputMessage) {
 	std::ofstream myFile;
 
 	myFile.open(tempFilePath1);
@@ -94,10 +120,6 @@ void ProcessHandler::showSplash(LPCTSTR inputMessage) {
 	CSplash splash(TEXT(".\\splash.bmp"), RGB(0, 0, 0), inputMessage);
 	splash.ShowSplash();
 
-	subscribeForSplashClose(splash);
-};
-
-int ProcessHandler::subscribeForSplashClose(CSplash splash) {
 	for (int a = 0; a < 1200; a = a + 1) {
 		struct stat buffer;
 		if (!(stat(tempFilePath1.c_str(), &buffer) == 0)) {
@@ -108,13 +130,13 @@ int ProcessHandler::subscribeForSplashClose(CSplash splash) {
 		Sleep(50);
 	}
 
+	splash.CloseSplash();
+
 	if (remove(tempFilePath1.c_str()) != 0)
 		return 0;
 	else
 		return 1;
-
-	splash.CloseSplash();
-}
+};
 
 
 

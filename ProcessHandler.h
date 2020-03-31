@@ -10,16 +10,14 @@ public:
 
 	LPCWSTR stringToLPCWSTR(string str);
 
-	LPCWSTR concatLPCWSTR(LPCWSTR str1, LPCWSTR str2);
+	wstring concatLPCWSTR(LPCWSTR str1, LPCWSTR str2);
 
-	void executeProgram(LPCWSTR command, LPCWSTR workingDir, bool isShowSPlash);
+	void executeProgram(LPCWSTR command, LPCWSTR workingDir, LPCWSTR inputMessage);
+	void executeProgram(LPCWSTR command, LPCWSTR workingDir);
 
 	LPCTSTR getInputMessage(int arg);
 
-	void showSplash(LPCTSTR inputMessage);
-
-private:
-	int subscribeForSplashClose(CSplash splash);
+	int showSplash(LPCTSTR inputMessage);
 
 };
 
